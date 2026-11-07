@@ -104,7 +104,7 @@ export const TIMON_THEME_TOKENS_CSS = `
     --secondary: var(--surface-4);
     --secondary-foreground: 345 12% 13%;
     --muted: var(--surface-2);
-    --muted-foreground: 18 10% 34%;
+    --muted-foreground: 18 10% 30%;
     --accent: var(--primary);
     --accent-foreground: 30 60% 97.5%;
     --border: 30 24% 81.5%;
@@ -123,6 +123,13 @@ export const TIMON_THEME_TOKENS_CSS = `
     --timon-scrollbar-thumb-hover: hsl(var(--primary) / 0.48);
 
     --hl-bg: #efe7de;
+    /* The default code colours are tuned for white: on this warmer block the
+     * comments, functions, strings and keywords fell to 3.7-4.4:1. One step
+     * deeper (GitHub's own darker shades) brings each above 5:1. */
+    --hl-comment: #57606a;
+    --hl-keyword: #a40e26;
+    --hl-string: #0f6b2e;
+    --hl-function: #6639ba;
 }
 `;
 

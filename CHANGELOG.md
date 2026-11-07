@@ -43,12 +43,27 @@ bump. Until a release is called, everything accumulates under `Unreleased`.
 ### Changed
 
 - The interface is easier on the eyes: the same Inter typeface on every system, a calmer light mode, and cards, badges and controls drawn with fills instead of outlines.
+- An agent without a picture shows its initial as a capital letter, as the canvas and your own avatar do.
+- In light mode, secondary text such as times, sizes and descriptions is a little darker and easier to read.
+- In light mode, code in the chat uses slightly deeper colours, so comments, strings and keywords are easier to read.
 
 ### Fixed
 
-- The main agent's avatar shows an "m" instead of an underscore.
+- The main agent's avatar shows an "M" instead of an underscore.
 - Conversations no longer open under a "Today" label that ignored the actual date.
 - Notification previews no longer show raw markdown markers such as `**` and backticks.
+- In light mode, the Kanban filters and search no longer fade into the page.
+- In light mode, a switch that is off no longer fades into the dialog behind it.
+- On the Agents page, "Import agents" and "Export" have icons and the same size as the other actions in the bar.
+- The project filter of the Home Tasks widget looks like the other filters instead of a plain form field.
+- Missions: the Success rate card keeps a clear edge in light mode, and table rows alternate visibly in dark mode.
+- Dialogs no longer have a thin outline; their shadow sets them apart.
+- Kanban: the last card of a long column fades out at its foot instead of being cut through.
+- On a phone, the chat's panel buttons above the composer sit on a light fill, like the other controls.
+- Agents canvas: the node and edge count sits a little higher above the action bar.
+- The Plugins page lines up with the Missions and Kanban pages instead of sitting 4px further right.
+- A switch you cannot change, such as a core module's on the Plugins page, is dimmed less and still reads as on.
+- Settings: content that scrolls fades out at the foot of the dialog instead of being cut through.
 
 ### Known issues
 
