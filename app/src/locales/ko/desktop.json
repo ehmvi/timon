@@ -2,6 +2,7 @@
   "desktop": {
     "menu": {
       "newWindow": "새 창",
+      "settings": "설정…",
       "open": "{appName} 열기",
       "daemon": "데몬: {state, select, running {실행 중} other {연결할 수 없음}} ({origin})",
       "quit": "종료"

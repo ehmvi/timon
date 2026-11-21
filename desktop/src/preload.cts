@@ -14,6 +14,12 @@ contextBridge.exposeInMainWorld('timonDesktop', {
   openLogsFolder: (): Promise<string> => ipcRenderer.invoke('timon:open-logs'),
   // About Timon and the speech-model licences (TODO #582).
   openAbout: (): Promise<void> => ipcRenderer.invoke('timon:open-about'),
+  // "Settings…" in the macOS menu bar: the page opens its dialog. Nothing crosses but the gesture.
+  onOpenSettings: (listener: () => void): (() => void) => {
+    const forward = (): void => listener();
+    ipcRenderer.on('timon:open-settings', forward);
+    return () => { ipcRenderer.removeListener('timon:open-settings', forward); };
+  },
   uninstall: {
     info: () => ipcRenderer.invoke('timon:uninstall-info'),
     run: (request: { mode: 'keep' | 'delete'; confirmation: string; locale: string }) => ipcRenderer.invoke('timon:uninstall', request),

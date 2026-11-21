@@ -107,7 +107,7 @@ import { missionsAtStake, previousAppImage, readMissionCount, removeAppImageBack
 import { nodeInstallerSystem, silentInstall, takeWindowsInstallFailure } from './update-installer.js';
 import { aboutCopy, readThirdPartyNotices, registerAboutIpc, thirdPartyNoticesPath } from './about.js';
 import { showAboutWindow } from './about-window.js';
-import { appMenuTemplate, newWindowCopy, newWindowShortcut } from './app-menu.js';
+import { appMenuTemplate, newWindowCopy, newWindowShortcut, OPEN_SETTINGS_CHANNEL } from './app-menu.js';
 import { launchedOtherBuild, shellBuild, staleShellCopy, type LaunchData } from './shell-build.js';
 import { shellLocalesDir, shellText, useShellLocales } from './shell-i18n.js';
 import { LOCALE_COOKIE, ShellLocale } from './shell-locale.js';
@@ -863,6 +863,25 @@ function openNewWindow(machineId: string | null = null): void {
 }
 
 /**
+ * "Settings…" of the macOS menu: the page on screen of the window in front
+ * opens its Settings dialog, over whatever it shows. With no window yet, or
+ * only the startup page, the window comes forward and that is all: there is
+ * no interface to open the dialog in.
+ */
+function openSettings(): void {
+  const caller = activeCaller(frontWindow());
+  if (!caller || releasePending || updateWindow) {
+    if (interfaceUrl) showWindow(interfaceUrl);
+    return;
+  }
+  const { record, page } = caller;
+  if (record.window.isMinimized()) record.window.restore();
+  record.window.show();
+  record.window.focus();
+  contentsOf(page).send(OPEN_SETTINGS_CHANNEL);
+}
+
+/**
  * "Open in a new window" (V5): the page of `caller`, at another of its routes,
  * in one more window just below it, on `machineId`. `url` is already checked to
  * be on the caller's origin (`parseOpenWindowRequest`).
@@ -972,6 +991,7 @@ function openAbout(): void {
 function installAppMenu(): void {
   const template = appMenuTemplate({
     platform: process.platform, appName: app.name, locale: uiLocale(), onAbout: openAbout, onNewWindow: () => openNewWindow(),
+    onSettings: () => openSettings(),
   });
   if (template) Menu.setApplicationMenu(Menu.buildFromTemplate(template));
   // macOS never sends a second launch to a running app: the Dock menu is where "New window" is looked for.

@@ -4,6 +4,7 @@ import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
 import { APP_INFO_CHANNEL } from './app-info.js';
 import { ABOUT_CHANNEL } from './about.js';
+import { OPEN_SETTINGS_CHANNEL } from './app-menu.js';
 import { OPEN_LOGS_CHANNEL } from './diagnostic-dialog.js';
 import {
   canRestartFromSetup, handoverKeptMessage, handoverRoute, relaunchOptions, serviceHandover, serviceHandoverNeeded, setupRestarter,
@@ -115,6 +116,7 @@ test('the sandbox preload exposes narrow restart, directory and browser presenta
     appInfo: (...args: unknown[]) => Promise<{ version: string }>;
     openLogsFolder: (...args: unknown[]) => Promise<string>;
     openAbout: (...args: unknown[]) => Promise<void>;
+    onOpenSettings: (listener: (...args: unknown[]) => void) => () => void;
     browser: { attach: (...args: unknown[]) => Promise<void>; detach: (...args: unknown[]) => Promise<void> };
     windowMachine: { set: (...args: unknown[]) => Promise<unknown> };
     openWindow: (...args: unknown[]) => Promise<unknown>;
@@ -160,7 +162,7 @@ test('the sandbox preload exposes narrow restart, directory and browser presenta
       };
     },
   });
-  assert.deepEqual(Object.keys(bridge), ['selectDirectory', 'selectPluginSource', 'selectExecutable', 'revealPath', 'setupRestartPending', 'restartAfterSetup', 'handOverToService', 'appInfo', 'openLogsFolder', 'openAbout', 'uninstall', 'speech', 'windowMachine', 'windowScheme', 'openWindow', 'browser', 'updates', 'tailscale']);
+  assert.deepEqual(Object.keys(bridge), ['selectDirectory', 'selectPluginSource', 'selectExecutable', 'revealPath', 'setupRestartPending', 'restartAfterSetup', 'handOverToService', 'appInfo', 'openLogsFolder', 'openAbout', 'onOpenSettings', 'uninstall', 'speech', 'windowMachine', 'windowScheme', 'openWindow', 'browser', 'updates', 'tailscale']);
   assert.deepEqual(Object.keys(bridge.browser), ['attach', 'detach']);
   // Multi-window V3: an id crosses, nothing else; the main process checks it is one.
   assert.deepEqual(Object.keys(bridge.windowMachine), ['set']);
@@ -202,6 +204,13 @@ test('the sandbox preload exposes narrow restart, directory and browser presenta
   assert.deepEqual(calls.at(-1), [OPEN_LOGS_CHANNEL], 'no path crosses the bridge');
   await bridge.openAbout('file:///etc/passwd');
   assert.deepEqual(calls.at(-1), [ABOUT_CHANNEL], 'the page cannot choose what the About window shows');
+  // "Settings…" of the macOS menu: the page hears the gesture, and nothing the sender attached.
+  const heard: unknown[][] = [];
+  const stopHearing = bridge.onOpenSettings((...args) => { heard.push(args); });
+  listeners.get(OPEN_SETTINGS_CHANNEL)?.({ sender: 'event' }, 'https://evil.example');
+  assert.deepEqual(heard, [[]]);
+  stopHearing();
+  assert.equal(listeners.has(OPEN_SETTINGS_CHANNEL), false);
   await bridge.tailscale.openInstaller('C:\\evil.msi', { url: 'https://evil.example/x.pkg' });
   assert.deepEqual(calls.at(-1), ['timon:tailscale-installer'], 'no path or URL crosses the bridge');
   await bridge.tailscale.openApp('/Applications/Evil.app');

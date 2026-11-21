@@ -2,6 +2,7 @@
   "desktop": {
     "menu": {
       "newWindow": "新建窗口",
+      "settings": "设置…",
       "open": "打开 {appName}",
       "daemon": "守护进程：{state, select, running {运行中} other {无法连接}}（{origin}）",
       "quit": "退出"

@@ -2,6 +2,7 @@
   "desktop": {
     "menu": {
       "newWindow": "New window",
+      "settings": "Settings…",
       "open": "Open {appName}",
       "daemon": "Daemon: {state, select, running {running} other {unreachable}} ({origin})",
       "quit": "Quit"

@@ -9,6 +9,17 @@ export function newWindowCopy(locale: string): { item: string } {
 }
 
 /**
+ * Sent to the page on screen when "Settings…" is chosen: the page opens its
+ * own dialog. Main to page only, and it carries nothing.
+ */
+export const OPEN_SETTINGS_CHANNEL = 'timon:open-settings';
+
+/** "Settings…", in the macOS application menu. */
+export function settingsCopy(locale: string): { item: string } {
+  return { item: shellText(locale)('menu.settings') };
+}
+
+/**
  * Ctrl+Shift+N (Cmd+Shift+N on macOS) opens a new window. Handled on
  * `before-input-event` like the reload keys: the window hides its menu bar on
  * Windows and Linux, so a menu accelerator alone would not be reliable there.
@@ -25,6 +36,10 @@ export function newWindowShortcut(input: ReloadKeyInput, platform: NodeJS.Platfo
  * licences of the speech models; this one opens Timon's window. Edit stays: on
  * macOS Cmd+C and Cmd+V only reach a page through its roles.
  *
+ * "Settings…" with Cmd+, sits under "About", where every Mac app has it. The
+ * accelerator is registered: it then works with the keyboard in the native
+ * browser panel too, which is another page than the interface.
+ *
  * `null` on Windows and Linux: Electron's default menu has no "About" there,
  * so nothing is replaced.
  */
@@ -35,6 +50,8 @@ export function appMenuTemplate(input: {
   onAbout: () => void;
   /** Absent: the File menu stays Electron's own. */
   onNewWindow?: () => void;
+  /** Absent: the application menu has no "Settings…". */
+  onSettings?: () => void;
 }): MenuItemConstructorOptions[] | null {
   if (input.platform !== 'darwin') return null;
   return [
@@ -43,6 +60,12 @@ export function appMenuTemplate(input: {
       submenu: [
         { label: aboutCopy(input.locale).trayItem, click: () => input.onAbout() },
         { type: 'separator' },
+        ...(input.onSettings
+          ? [
+            { label: settingsCopy(input.locale).item, accelerator: 'CmdOrCtrl+,', click: () => input.onSettings?.() },
+            { type: 'separator' },
+          ] satisfies MenuItemConstructorOptions[]
+          : []),
         { role: 'services' },
         { type: 'separator' },
         { role: 'hide' },

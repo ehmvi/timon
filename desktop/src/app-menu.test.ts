@@ -52,6 +52,28 @@ test('app menu: every other default menu of Electron stays', () => {
   assert.deepEqual(appEntries, ['services', 'hide', 'hideOthers', 'unhide', 'quit']);
 });
 
+test('app menu: "Settings…" with Cmd+, follows "About", where every Mac app has it', () => {
+  let opened = 0;
+  const items = appMenuTemplate({ platform: 'darwin', appName: 'Timon', locale: 'en-US', onAbout: () => {}, onSettings: () => { opened += 1; } });
+  assert.ok(items);
+  const appMenu = items[0]?.submenu;
+  assert.ok(Array.isArray(appMenu));
+  const settings = appMenu[2];
+  assert.equal(settings?.label, 'Settings…');
+  assert.equal(appMenu[1]?.type, 'separator');
+  assert.equal(appMenu[3]?.type, 'separator');
+  // Registered: Cmd+, must work when the keyboard is in the native browser panel too.
+  assert.equal(settings?.accelerator, 'CmdOrCtrl+,');
+  assert.notEqual(settings?.registerAccelerator, false);
+  settings?.click?.({} as never, undefined, {} as never);
+  assert.equal(opened, 1);
+  assert.ok(aboutEntry(appMenuTemplate({ platform: 'darwin', appName: 'Timon', locale: 'fr-FR', onAbout: () => {}, onSettings: () => {} }) ?? [], 'Paramètres…'));
+});
+
+test('app menu: without a handler there is no "Settings…" entry', () => {
+  assert.equal(flatten(template()).some((item) => item.accelerator === 'CmdOrCtrl+,'), false);
+});
+
 test('app menu: Windows and Linux keep Electron\'s menu, which has no About', () => {
   for (const platform of ['win32', 'linux'] as const) {
     assert.equal(appMenuTemplate({ platform, appName: 'Timon', locale: 'en', onAbout: () => {} }), null);
