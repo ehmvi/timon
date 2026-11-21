@@ -20,6 +20,7 @@ import { PLATFORM_MODULES } from '@/lib/plugin-host/modules';
 import { PlatformGlobals } from '@/lib/plugin-host/platform-globals';
 import { ClientPluginHost } from '@/lib/plugin-host/client-plugin-host';
 import { SettingsDialogHost } from '@/components/settings/settings-dialog-host';
+import { DesktopSettingsMenu } from '@/components/settings/desktop-settings-menu';
 import { FirstRunGate } from '@/components/first-run-gate';
 import { FIRST_RUN_ALLOWED, FIRST_RUN_SCHEME_KEY } from '@/lib/first-run-gate';
 import { BetaLockScreen } from '@/components/beta-lock-screen';
@@ -363,6 +364,9 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <SettingsDialogHost />
           </Suspense>
+          {/* "Settings…" of the desktop app's macOS menu bar: the shell
+              says it was chosen, the page opens the dialog above. */}
+          <DesktopSettingsMenu />
         </BackgroundProvider>
         </ThemeProvider>
         </div>

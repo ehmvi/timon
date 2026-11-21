@@ -17,6 +17,11 @@ declare global {
       openLogsFolder?: () => Promise<string>;
       /** Opens "About Timon" with the speech-model licences (TODO #582); absent from an older desktop. */
       openAbout?: () => Promise<void>;
+      /**
+       * "Settings…" of the macOS menu bar was chosen: the page opens its
+       * dialog. Returns the unsubscribe. Absent from an older desktop.
+       */
+      onOpenSettings?: (listener: () => void) => () => void;
       uninstall?: {
         info: () => Promise<{ home: string; platform: string; appImage: string | null }>;
         run: (request: { mode: 'keep' | 'delete'; confirmation: string; locale: string }) => Promise<{ cancelled: boolean }>;
